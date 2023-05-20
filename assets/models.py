@@ -33,7 +33,7 @@ class Employee(models.Model):
         return self.user.get_full_name()
     
 class Device(models.Model):
-    devic_name = models.CharField(max_length=200)
+    device_name = models.CharField(max_length=200)
     device_type = models.CharField(max_length=15, choices=CHOICES)
     owner = models.ForeignKey(Company, on_delete=models.CASCADE)
     amount = models.IntegerField(default=0)
@@ -51,7 +51,7 @@ class Device(models.Model):
 class DeviceLog(models.Model):
 
     device = models.ForeignKey(Device, on_delete=models.CASCADE)
-    employee = models.ForeignKey(Employee, on_delete=models.RESTRICT)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     checkout_date = models.DateField()
     return_date = models.DateField(blank=True, null=True)
     condition_on_checkout = models.TextField()
@@ -61,6 +61,7 @@ class DeviceLog(models.Model):
 
         if not self.return_date or self.return_date > timezone.now():
             condition_on_return = "Not returned yet."
+        super().save(*args, **kwargs)
 
     def __str__(self): 
         return f"Device: {self.device}, Employee: {self.employee}, Checkout Date: {self.checkout_date}"

@@ -49,7 +49,7 @@ def add_device(request):
     if request.method == 'POST':
         form = DeviceForm(request.POST)
         if form.is_valid():
-            device = form.save() 
+            device = form.save()
             return redirect('company_device_list')
     else:
         form = DeviceForm()

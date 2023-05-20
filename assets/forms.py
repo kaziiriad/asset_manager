@@ -5,8 +5,7 @@ class EmployeeForm(forms.ModelForm):
     class Meta:
         model = Employee
         fields = ['user', 'company', 'joined']
-        exclude = ('user')
-
+        exclude = ('user',)
 class DeviceForm(forms.ModelForm):
     class Meta:
         model = Device
