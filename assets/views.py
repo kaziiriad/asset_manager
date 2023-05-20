@@ -1,14 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Company, Employee, Device, DeviceLog
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.db.models.deletion import ProtectedError
 from django.utils import timezone
+from .forms import DeviceForm, EmployeeForm
+
 
 #Company lists. Might be redundant. Deal with it later.
 def company_list(request):
-    companies = Company.objects.all()
-    return render(request, 'company_list.html', {'companies': companies})
+    company = Company.objects.all()
+    return render(request, 'company_list.html', {'company': company})
 
 #shows full list of employees of a company
 @login_required
@@ -17,11 +17,45 @@ def company_employee_list(request, company_id):
     employees = company.objects.filter(company=company)
     return render(request, 'company_detail.html', {'company': company, 'employees': employees})
 
+
+#create new employee
+@login_required
+def create_employee(request, company_id):
+    company = get_object_or_404(Company, id=company_id)
+
+    if request.method == 'POST':
+        form = EmployeeForm(request.POST)
+
+        if form.is_valid():
+            employee = form.save(commit=False)
+            employee.company = company 
+            employee.joined = timezone.now()
+            employee.save()
+            return redirect('company_employee_list')
+    else:
+        form = EmployeeForm()
+
+    return render(request, 'create_employee.html', {'form': form})
+
 #employee details.
 @login_required
 def employee_detail(request, employee_id):
     employee = get_object_or_404(Employee, id=employee_id)
     return render(request, 'employee_detail.html', {'employee': employee})
+
+#adds device to the database.
+@login_required
+def add_device(request):
+    if request.method == 'POST':
+        form = DeviceForm(request.POST)
+        if form.is_valid():
+            device = form.save() 
+            return redirect('company_device_list')
+    else:
+        form = DeviceForm()
+
+    return render(request, 'add_device.html', {'form': form})
+
 
 #List of devices each company has.
 @login_required
@@ -53,7 +87,7 @@ def checkout_device(request, device_id, employee_id):
             condition_on_checkout="Good"
         )
 
-        return redirect("device_list_url")
+        return redirect("company_device_list")
     
     
     return render(request, "checkout_error.html")
@@ -71,6 +105,6 @@ def return_device(request, log_id):
         device = device_log.device
         device.update_amount(is_checkout=False)
 
-        return redirect('device_list_url')
+        return redirect('company_device_list')
 
     return render(request, 'return_error.html')
