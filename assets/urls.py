@@ -55,4 +55,6 @@ urlpatterns = [
         views.return_device, 
         name='return_device'
     ),
+
+
 ]
