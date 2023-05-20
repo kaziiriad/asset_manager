@@ -16,7 +16,7 @@ CHOICES = [
     ('Softlight', 'SoftLight')
 ]
 
-class Company(model.Model):
+class Company(models.Model):
     user = models.OneToOneField(User, on_delete=models.PROTECT)
     name = models.CharField(max_length=100)
 
@@ -39,7 +39,7 @@ class Employee(models.Model):
 class Device(models.Model):
     devic_name = models.CharField(max_length=200)
     device_type = models.CharField(max_length=15, choices=CHOICES)
-    owner = models.ForeignKey(Company, on_delete=CASCADE)
+    owner = models.ForeignKey(Company, on_delete=models.CASCADE)
     amount = models.IntegerField(default=0)
 
     def __str__(self):
