@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+import uuid
 # Create your models here.
 
 CHOICES = [
@@ -17,24 +18,19 @@ CHOICES = [
 ]
 
 class Company(models.Model):
-    user = models.OneToOneField(User, on_delete=models.PROTECT)
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
 
 class Employee(models.Model):
-
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+    
+    user = models.OneToOneField(User, on_delete=models.PROTECT)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     joined = models.DateField()
 
-    def get_full_name(self):
-        return self.first_name + " " + self.last_name
-    
     def __str__(self):
-        return self.get_full_name()
+        return self.user.get_full_name()
     
 class Device(models.Model):
     devic_name = models.CharField(max_length=200)
@@ -42,6 +38,13 @@ class Device(models.Model):
     owner = models.ForeignKey(Company, on_delete=models.CASCADE)
     amount = models.IntegerField(default=0)
 
+    def update_amount(self, is_checkout):
+        if is_checkout:
+            self.amount -= 1
+        else:
+            self.amount += 1
+        self.save()
+    
     def __str__(self):
         return self.device_type
     
